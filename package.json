@@ -1,0 +1,57 @@
+{
+    "name": "abbclone",
+    "version": "0.0.1",
+    "description": "Awesome project developed with TypeORM.",
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.1",
+        "@types/ioredis": "^4.0.1",
+        "@types/jest": "^23.3.1",
+        "@types/node": "^10.9.4",
+        "@types/node-fetch": "^2.1.2",
+        "@types/uuid": "^3.4.4",
+        "@types/yup": "^0.24.9",
+        "jest": "^23.5.0",
+        "nodemon": "^1.18.4",
+        "start-server-and-test": "^1.7.1",
+        "ts-jest": "^23.1.4",
+        "ts-node": "^7",
+        "tslint": "^5.11.0",
+        "tslint-config-prettier": "^1.15.0",
+        "typescript": "^3.0.3"
+    },
+    "dependencies": {
+        "apollo-server-express": "^2.0.6",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.4",
+        "express": "^4.16.3",
+        "graphql": "^14.0.2",
+        "graphql-import": "^0.6.0",
+        "graphql-request": "^1.8.2",
+        "ioredis": "^4.0.0",
+        "node-fetch": "^2.2.0",
+        "pg": "^7.4.3",
+        "reflect-metadata": "^0.1.12",
+        "typeorm": "0.2.7",
+        "uuid": "^3.3.2",
+        "yup": "^0.26.3"
+    },
+    "scripts": {
+        "start": "NODE_ENV=development nodemon --exec ts-node src/index.ts",
+        "test": "NODE_ENV=test jest --detectOpenHandles --forceExit"
+    },
+    "jest": {
+        "globalSetup": "./src/testSetup/callSetup.js",
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
+        ]
+    }
+}
