@@ -2,9 +2,10 @@ import * as bcrypt from 'bcryptjs';
 import {ResolverMap} from '../../types/graphql-utils';
 import * as yup from 'yup';
 import {User} from '../../typeORM/entity/User';
-import {formatYupError} from '../../../utils/formatyuperrors';
-import {duplicateEmail, emailNotLongEnough, emailTooLong, emailNotValid, passwordNotLongEnough} from '../../../utils/errorMessages';
-import {createConfirmEmailLink} from '../../../utils/createConfirmEmailLink';
+import {formatYupError} from '../../../utilitaires/formatyuperrors';
+import {duplicateEmail, emailNotLongEnough, emailTooLong, emailNotValid, passwordNotLongEnough} from '../../../utilitaires/errorMessages';
+import {createConfirmEmailLink} from '../../utils/createConfirmEmailLink';
+import {sendEmail} from '../../../utilitaires/sendEmail';
 
 const schema = yup
     .object()
@@ -49,8 +50,28 @@ export const resolvers : ResolverMap = {
                 }
                 const hashedPassword = await bcrypt.hash(args.password, 10);
                 const user = User.create({email: args.email, password: hashedPassword});
+                console.log("userID " + user.id);
                 await user.save();
-                await createConfirmEmailLink(url, user.id, redis);
+                const confirmMailLink = await createConfirmEmailLink(url, user.id, redis);
+                const message = process.env.NODE_ENV === "test"
+                    ? `
+                <html>
+                <body>
+                <p>Ceci est un test avec nodemailer et gmail</p>
+                <a href="${confirmMailLink}">${confirmMailLink}</a>
+                </body>
+                </html>
+                `
+                    : `
+                <html>
+                <body>
+                <p>Ceci est un test avec nodemailer et gmail</p>
+                <a href="${confirmMailLink}">${confirmMailLink}</a>
+                </body>
+                </html>
+                `;
+                sendEmail("testServer@typescript.com", args.email, "test sending email with links", message);
+                console.log(url);
                 return null;
             }
         }

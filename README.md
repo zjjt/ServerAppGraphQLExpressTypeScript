@@ -6,7 +6,8 @@ Steps to run this project:
 2- Run yarn test or npm test to run tests
 3-If you are confident then run yarn start or npm start
 
-This server supports LDAP authentication
+#TODO
+-add LDAP support authentication
 
 mutations:
 -createUser

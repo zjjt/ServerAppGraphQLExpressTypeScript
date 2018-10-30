@@ -1,50 +1,41 @@
-import {ApolloServer, makeExecutableSchema, mergeSchemas} from 'apollo-server-express';
+import {ApolloServer} from 'apollo-server-express';
 import * as express from 'express';
 import makeDBconnexion from './connectors';
-import * as fs from 'fs';
-import * as path from 'path';
-import {importSchema} from 'graphql-import';
-import * as Redis from 'ioredis';
-import {User} from './typeORM/entity/User';
+import {redis} from './redis';
+import {confirmEmailRoute} from './routes/confirmEmail';
+import {genSchema} from './generateSchema';
+import * as session from 'express-session';
+import * as connectRedis from 'connect-redis';
 
 const startServer = async() => {
 
-    const schemas : any = [];
-    const folders = fs.readdirSync(path.join(__dirname, "./modules"));
-    // read module folder for schema stiching in apollo server 2
-    folders.forEach((folder) => {
-        const {resolvers} = require(`./modules/${folder}/resolvers`);
-        const typeDefs = importSchema(path.join(__dirname, `./modules/${folder}/schema.graphql`));
-        schemas.push(makeExecutableSchema({typeDefs, resolvers}));
-    });
-    const redis = new Redis({
-        showFriendlyErrorStack: (process.env.NODE_ENV !== "production")
-    });
+    const SESSION_SECRET = "8765567890gfghj";
+    const RedisStore = connectRedis(session);
+
     const server = new ApolloServer({
-        schema: mergeSchemas({schemas}),
+        schema: genSchema(),
         context: async({req} : any) => ({
             redis,
-            url: req.protocol + "://" + req.get("host")
+            url: req.protocol + "://" + req.get("host"),
+            session: req.session
         })
     });
     const expressApp = express();
-    server.applyMiddleware({app: expressApp, cors: true});
 
-    expressApp.get("/confirm-user/:id", async(req, res) => {
-        const {id} = req.params;
-        console.log(id);
-        const userId = await redis.get(id);
-        await redis.del(id);
-        if (userId) {
-            await User.update({
-                id: userId
-            }, {confirmed: true});
-            res.send("ok");
-        } else {
-            res.send("invalid");
+    expressApp.use(session({
+        store: new RedisStore({client: redis as any}),
+        name: "rid",
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 1000 * 60 * 60 * 24 *7 // 7 days
         }
-
-    });
+    }))
+    expressApp.get("/confirm-user/:id", confirmEmailRoute);
+    server.applyMiddleware({app: expressApp, cors: true});
     await makeDBconnexion();
     // prettier-ignore
     let port : any;
@@ -58,7 +49,6 @@ const startServer = async() => {
             : 4000;
         console.log(`GraphQL server running at http://localhost:${port}${server.graphqlPath}`)
     })
-    console.log("port " + port + server.graphqlPath);
     const App = {
         app,
         port: process.env.NODE_ENV === "test"

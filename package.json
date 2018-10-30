@@ -4,15 +4,17 @@
     "description": "Awesome project developed with TypeORM.",
     "devDependencies": {
         "@types/bcryptjs": "^2.4.1",
+        "@types/connect-redis": "^0.0.7",
+        "@types/express-session": "^1.15.11",
         "@types/ioredis": "^4.0.1",
         "@types/jest": "^23.3.1",
         "@types/node": "^10.9.4",
         "@types/node-fetch": "^2.1.2",
+        "@types/nodemailer": "^4.6.5",
         "@types/uuid": "^3.4.4",
         "@types/yup": "^0.24.9",
         "jest": "^23.5.0",
         "nodemon": "^1.18.4",
-        "start-server-and-test": "^1.7.1",
         "ts-jest": "^23.1.4",
         "ts-node": "^7",
         "tslint": "^5.11.0",
@@ -20,15 +22,20 @@
         "typescript": "^3.0.3"
     },
     "dependencies": {
+        "@gql2ts/from-schema": "^1.9.0",
         "apollo-server-express": "^2.0.6",
         "bcryptjs": "^2.4.3",
+        "connect-redis": "^3.4.0",
         "cors": "^2.8.4",
+        "dotenv": "^6.0.0",
         "express": "^4.16.3",
+        "express-session": "^1.15.6",
         "graphql": "^14.0.2",
         "graphql-import": "^0.6.0",
         "graphql-request": "^1.8.2",
         "ioredis": "^4.0.0",
         "node-fetch": "^2.2.0",
+        "nodemailer": "^4.6.8",
         "pg": "^7.4.3",
         "reflect-metadata": "^0.1.12",
         "typeorm": "0.2.7",
@@ -37,7 +44,8 @@
     },
     "scripts": {
         "start": "NODE_ENV=development nodemon --exec ts-node src/index.ts",
-        "test": "NODE_ENV=test jest --detectOpenHandles --forceExit"
+        "test": "NODE_ENV=test jest --verbose",
+        "gen-schema-types": "ts-node ./src/graphqlExpress/scripts/createTypes.ts "
     },
     "jest": {
         "globalSetup": "./src/testSetup/callSetup.js",
